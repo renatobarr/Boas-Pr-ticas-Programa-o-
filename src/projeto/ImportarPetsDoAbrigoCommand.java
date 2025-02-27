@@ -1,4 +1,4 @@
-package br.com.alura;
+package br.com.alura.projeto;
 
 import br.com.alura.client.ClientHttpConfiguration;
 import br.com.alura.service.PetService;

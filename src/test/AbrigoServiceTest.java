@@ -1,4 +1,4 @@
-package br.com.alura.teste.service;
+package br.com.alura.teste;
 
 import br.com.alura.client.ClientHttpConfiguration;
 import br.com.alura.domain.Abrigo;
