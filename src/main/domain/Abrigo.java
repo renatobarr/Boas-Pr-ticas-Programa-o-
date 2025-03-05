@@ -1,19 +1,29 @@
 package br.com.alura.domain;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Abrigo {
 
-    private long id;
+    private final long id; // Definido como final para evitar modificações após a criação
     private String nome;
     private String telefone;
     private String email;
-    private Pet[] pets;
+    private List<Pet> pets;
 
-    public Abrigo() {}
+    // Construtor padrão
+    public Abrigo() {
+        this.id = 0; // Para compatibilidade, mas o ideal é ser gerado por banco de dados
+        this.pets = new ArrayList<>();
+    }
     
-    public Abrigo(String nome, String telefone, String email) {
+    // Construtor completo
+    public Abrigo(long id, String nome, String telefone, String email) {
+        this.id = id;
         this.nome = nome;
         this.telefone = telefone;
         this.email = email;
+        this.pets = new ArrayList<>();
     }
 
     public long getId() {
@@ -32,19 +42,38 @@ public class Abrigo {
         return email;
     }
 
-    public Pet[] getPets() {
+    public List<Pet> getPets() {
         return pets;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public void setTelefone(String telefone) {
+        this.telefone = telefone;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void adicionarPet(Pet pet) {
+        this.pets.add(pet);
+    }
+
+    public void removerPet(Pet pet) {
+        this.pets.remove(pet);
     }
 
     @Override
     public String toString() {
-        return """
-                     "id":%s,"nome":"%s","telefone":"%s","email":"%s"
-                     """.formatted(this.id, this.nome, this.telefone, this.email);
+        return "Abrigo{" +
+                "id=" + id +
+                ", nome='" + nome + '\'' +
+                ", telefone='" + telefone + '\'' +
+                ", email='" + email + '\'' +
+                ", pets=" + pets +
+                '}';
     }
-
 }

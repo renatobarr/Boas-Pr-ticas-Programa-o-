@@ -3,45 +3,55 @@ package br.com.alura.teste.service;
 import br.com.alura.client.ClientHttpConfiguration;
 import br.com.alura.domain.Abrigo;
 import br.com.alura.service.AbrigoService;
-import org.junit.jupiter.api.Assertions;
+import com.google.gson.Gson;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
 import java.net.http.HttpResponse;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
 
+@ExtendWith(MockitoExtension.class)
 public class AbrigoServiceTest {
-    private ClientHttpConfiguration client = mock(ClientHttpConfiguration.class);
-    private AbrigoService abrigoService = new AbrigoService(client);
-    private HttpResponse<String> response = mock(HttpResponse.class);
-    private Abrigo abrigo = new Abrigo("Teste", "61981880392", "abrigo_alura@gmail.com");
+    
+    @Mock
+    private ClientHttpConfiguration client;
+    
+    @Mock
+    private HttpResponse<String> response;
+    
+    private AbrigoService abrigoService;
+    private final Gson gson = new Gson(); 
+    private final Abrigo abrigo = new Abrigo("Teste", "61981880392", "abrigo_alura@gmail.com");
+
+    @BeforeEach
+    public void setup() {
+        abrigoService = new AbrigoService(client);
+        abrigo.setId(0L);
+    }
 
     @Test
     public void deveVerificarSeDispararRequisicaoGetSeraChamado() throws Exception {
-        abrigo.setId(0L);
-        String expectedAbrigosCadastrados = "Abrigos cadastrados:";
-        String expectedIdENome = "0 - Teste";
-
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        PrintStream printStream = new PrintStream(baos);
-        System.setOut(printStream);
-
-        when(response.body()).thenReturn("[{"+abrigo.toString()+"}]");
+   
+        String jsonResponse = gson.toJson(List.of(abrigo));
+        when(response.body()).thenReturn(jsonResponse);
         when(client.dispararRequisicaoGet(anyString())).thenReturn(response);
 
-        abrigoService.listarAbrigo();
+     
+        List<Abrigo> abrigos = abrigoService.listarAbrigo();
 
-        String[] lines = baos.toString().split(System.lineSeparator());
-        String actualAbrigosCadastrados = lines[0];
-        String actualIdENome = lines[1];
-
-        Assertions.assertEquals(expectedAbrigosCadastrados, actualAbrigosCadastrados);
-        Assertions.assertEquals(expectedIdENome, actualIdENome);
+    
+        assertNotNull(abrigos, "A lista de abrigos não pode ser nula.");
+        assertEquals(1, abrigos.size(), "Deveria haver exatamente um abrigo na lista.");
+        assertEquals("Teste", abrigos.get(0).getNome(), "O nome do abrigo não corresponde.");
+        
+   
+        verify(client, times(1)).dispararRequisicaoGet(anyString());
     }
-
 }
